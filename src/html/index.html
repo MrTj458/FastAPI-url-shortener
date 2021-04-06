@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Shortener</title>
+    <style>
+      *,
+      *:before,
+      *:after {
+        margin: 0;
+        padding: 0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #fefefe;
+        font-family: sans-serif;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+      }
+
+      h1 {
+        margin-bottom: 3rem;
+      }
+
+      input {
+        width: 600px;
+        padding: 0.1rem 0.5rem;
+        font-size: 1.4rem;
+        border: none;
+        border-bottom: 1px solid #000;
+        margin-bottom: 1rem;
+      }
+
+      input:focus {
+        outline: 0;
+        border-bottom: 1px solid rgb(70, 175, 0);
+      }
+
+      button {
+        border: 0;
+        padding: 1rem 2rem;
+        color: #fff;
+        background: rgb(70, 175, 0);
+        border-radius: 4px;
+        text-transform: uppercase;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      #app {
+        width: 100%;
+        height: 100vh;
+      }
+
+      .main-form {
+        padding-top: 3rem;
+      }
+
+      .modal {
+        z-index: 1000;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+      }
+
+      .container {
+        width: 600px;
+        max-width: 100%;
+        background-color: white;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        margin-top: 3rem;
+        padding: 2rem 3rem;
+      }
+
+      .close {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        cursor: pointer;
+      }
+
+      .info-button {
+        position: fixed;
+        bottom: 5px;
+        right: 5px;
+      }
+
+      .info {
+        font-weight: bold;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+
+      .margin {
+        margin-bottom: 1rem;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Main Page  -->
+      <form class="main-form" @submit.prevent="handleCreate">
+        <h1>URL Shortener</h1>
+        <input v-model="url" type="text" placeholder="Enter URL" />
+        <button>Shorten!</button>
+      </form>
+      <!-- Created Modal -->
+      <div :class="{modal: true, hidden: !showCreatedModal}">
+        <div class="container">
+          <p class="close" @click="showCreatedModal = false">X</p>
+          <h1>Here is your shortened URL:</h1>
+          <h3><a :href="fullURL">{{ fullURL }}</a></h3>
+        </div>
+      </div>
+      <!-- Info Button -->
+      <div class="info-button">
+        <button @click="showInfoModal = true">Get Link Info</button>
+      </div>
+      <!-- Info Modal -->
+      <div :class="{modal: true, hidden: !showInfoModal}">
+        <div class="container">
+          <p class="close" @click="showInfoModal = false">X</p>
+          <h1>Get Link Info:</h1>
+          <form @submit.prevent="handleInfo">
+            <input
+              v-model="id"
+              style="width: 400px"
+              type="text"
+              placeholder="Link ID"
+            />
+            <button class="margin">Get Info</button>
+          </form>
+          <div class="info">
+            <p>ID:</p>
+            <p>{{link.id}}</p>
+          </div>
+          <div class="info">
+            <p>Destination URL:</p>
+            <a :href="link.url">{{link.url}}</a>
+          </div>
+          <div class="info">
+            <p>Shortened URL:</p>
+            <a :href="fullURL">{{fullURL}}</a>
+          </div>
+          <div class="info">
+            <p>Clicks:</p>
+            <p>{{link.uses}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vue.js script -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          url: '',
+          id: '',
+          link: {},
+          showCreatedModal: false,
+          showInfoModal: false,
+        },
+        computed: {
+          fullURL() {
+            if (this.link.id) {
+              return `${window.location.protocol}//${window.location.host}/${this.link.id}`
+            }
+            return ''
+          },
+        },
+        methods: {
+          async handleCreate() {
+            if (!this.url) {
+              alert('Please enter a URL to shorten')
+              return
+            }
+
+            const res = await fetch('/create', {
+              method: 'POST',
+              body: JSON.stringify({
+                url: this.url,
+              }),
+            })
+            const data = await res.json()
+
+            this.link = data
+            this.showCreatedModal = true
+          },
+          async handleInfo() {
+            if (!this.id) {
+              alert('Enter a link ID')
+            }
+
+            const res = await fetch(`/${this.id}/info`)
+            if (!res.ok) {
+              alert(`Unable to find link with ID: ${this.id}`)
+              return
+            }
+            const data = await res.json()
+
+            this.link = data
+          },
+        },
+      })
+    </script>
+  </body>
+</html>
