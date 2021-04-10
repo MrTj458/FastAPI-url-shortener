@@ -4,125 +4,8 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="static/styles.css" />
     <title>URL Shortener</title>
-    <style>
-      *,
-      *:before,
-      *:after {
-        margin: 0;
-        padding: 0;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        background: #fefefe;
-        font-family: sans-serif;
-      }
-
-      form {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-      }
-
-      h1 {
-        margin-bottom: 3rem;
-      }
-
-      input {
-        width: 600px;
-        padding: 0.1rem 0.5rem;
-        font-size: 1.4rem;
-        border: none;
-        border-bottom: 1px solid #000;
-        margin-bottom: 1rem;
-      }
-
-      input:focus {
-        outline: 0;
-        border-bottom: 1px solid rgb(70, 175, 0);
-      }
-
-      button {
-        border: 0;
-        padding: 1rem 2rem;
-        color: #fff;
-        background: rgb(70, 175, 0);
-        border-radius: 4px;
-        text-transform: uppercase;
-        font-weight: bold;
-        cursor: pointer;
-      }
-
-      #app {
-        width: 100%;
-        height: 100vh;
-      }
-
-      .main-form {
-        padding-top: 3rem;
-      }
-
-      .modal {
-        z-index: 1000;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-      }
-
-      .container {
-        width: 600px;
-        max-width: 100%;
-        background-color: white;
-        border-radius: 4px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        position: relative;
-        margin-top: 3rem;
-        padding: 2rem 3rem;
-      }
-
-      .close {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        cursor: pointer;
-      }
-
-      .info-button {
-        position: fixed;
-        bottom: 5px;
-        right: 5px;
-      }
-
-      .info {
-        font-weight: bold;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 1rem;
-      }
-
-      .margin {
-        margin-bottom: 1rem;
-      }
-
-      .hidden {
-        display: none;
-      }
-    </style>
   </head>
   <body>
     <div id="app">
@@ -164,7 +47,7 @@
           </div>
           <div class="info">
             <p>Destination URL:</p>
-            <a :href="link.url">{{link.url}}</a>
+            <a :href="link.url">{{truncatedDestination}}</a>
           </div>
           <div class="info">
             <p>Shortened URL:</p>
@@ -175,6 +58,13 @@
             <p>{{link.uses}}</p>
           </div>
         </div>
+      </div>
+      <!-- Creaded by info -->
+      <div class="creator">
+        <p>
+          Created by
+          <a href="https://trevorhodsdon.dev" target="_blank">Trevor Hodsdon</a>
+        </p>
       </div>
     </div>
 
@@ -196,6 +86,14 @@
               return `${window.location.protocol}//${window.location.host}/${this.link.id}`
             }
             return ''
+          },
+          truncatedDestination() {
+            if (this.link.id) {
+              if (this.link.url.length > 50) {
+                return this.link.url.substring(0, 20) + '...'
+              }
+              return this.link.url
+            }
           },
         },
         methods: {
