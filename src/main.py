@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from .models import LinkCreate, LinkSchema, Link, Base
 from .database import engine
@@ -8,13 +9,15 @@ from .dependencies import get_db
 
 app = FastAPI()
 
+app.mount('/static', StaticFiles(directory='src/static'), name='static')
+
 Base.metadata.create_all(bind=engine)
 
 
 @app.get('/')
 def index(db: Session = Depends(get_db)):
     """Get the web interface."""
-    return FileResponse('src/html/index.html')
+    return FileResponse('src/static/index.html')
 
 
 @app.get('/all', response_model=List[LinkSchema])
