@@ -4,6 +4,7 @@ click==7.1.2
 fastapi==0.63.0
 greenlet==1.0.0
 h11==0.12.0
+psycopg2-binary==2.8.6
 pycodestyle==2.7.0
 pydantic==1.8.1
 SQLAlchemy==1.4.5
