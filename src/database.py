@@ -7,7 +7,7 @@ url = os.environ.get('DATABASE_URL')
 if url:
     url = url.replace('postgres', 'postgresql')
 else:
-    url = 'postgresql://urluser:password@localhost:5432/urlshortener'
+    url = 'sqlite:///app.db'
 
 engine = create_engine(url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
